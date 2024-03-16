@@ -1,0 +1,55 @@
+import json
+import requests
+import os
+from datetime import datetime
+
+def save_to_file(question, answer):
+    with open("Capt_logs.txt", "a") as file:
+        file.write(f"{datetime.now().strftime('%Y-%m-%d %I:%M %p')}: Question: {question}\n")
+        file.write(f"{datetime.now().strftime('%Y-%m-%d %I:%M %p')}: Answer: {answer}\n\n")
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+url = "https://chat.tune.app/api/chat/completions"
+headers = {
+    "Authorization": "tune-faa88cbb-18f8-4a97-a909-b1fae72430c81710549351",
+    "Content-Type": "application/json"
+}
+model = "goliath-120b-16k-gptq"
+
+clear_screen()
+
+# Display instructions
+print("Welcome to TuneChat! You can start a conversation by typing your message below.")
+print("\nType 'q' to exit the conversation.\n")
+
+while True:
+    user_input = input("\nAsk Professor Bash >> ")
+    if user_input.lower() == 'q':
+        print("\nExiting conversation.")
+        break
+
+    data = {
+        "temperature": 0.5,
+        "messages": [
+            {
+              "role": "system",
+              "content": "You are TuneChat"
+            },
+            {
+              "role": "user",
+              "content": user_input
+            }
+        ],
+        "model": model,
+        "stream": False,
+        "max_tokens": 1000
+    }
+    response = requests.post(url, headers=headers, json=data)
+    response_json = response.json()
+    answer = response_json['choices'][0]['message']['content']
+    print("Professor Bash Says >>\n \n", answer )
+#    print(answer)
+    print()  # Add a newline after printing the TuneChat response
+    save_to_file(user_input, answer
